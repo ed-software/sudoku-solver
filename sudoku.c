@@ -5,72 +5,19 @@
  * License: Public domain code.
  */
 
-#include <assert.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define SUBDIMENSION	(3)
-#define MIN_NUM		(1)
-#define MAX_NUM		(9)
-#define TOTAL_NUMS	(9)
-#define ARRAY_SIZE	(MIN_NUM + TOTAL_NUMS)
-
-#ifdef ASSERT
-#define assert_(A) assert(A)
-#else
-#define assert_(A)
-#endif
-
-/*
- *
- * CANDIDATES.
- *
- */
-
-/*
- * A candidates array represents which values have already been used for a row,
- * column or square.
- */
-typedef int candidates[ARRAY_SIZE];
-
-/*
- * A cell has a flag to indicate if its value has been set or not, the cell
- * value and three pointers to candidate arrays. One for the row it belongs to,
- * one for the column it belongs to and one for the square it belongs to.
- */
-struct cell {
-	int has_value;
-	int value;
-
-	candidates *row_candidates;
-	candidates *col_candidates;
-	candidates *square_candidates;
-};
-
-/*
- * A board has a number of unset cells, a matrix of cells and the candidate
- * arrays for each row, column and square in the board.
- */
-struct board {
-	int unset_cells;
-	struct cell cells[ARRAY_SIZE][ARRAY_SIZE];
-
-	candidates rows[ARRAY_SIZE];
-	candidates columns[ARRAY_SIZE];
-	candidates squares[ARRAY_SIZE];
-};
-
-void init_board(struct board *b);
-void read_board(FILE *f, struct board *b);
-int solve_board(struct board *b, int r, int c);
+ #include <assert.h>
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+#include "sudoku.h"
 
 /*
  *
  * MAIN PROGRAM.
  *
  */
-
+/*
 int main(int argc, char *argv[])
 {
 	FILE *in;
@@ -93,14 +40,14 @@ int main(int argc, char *argv[])
 		in = stdin;
 	}
 
-	/* Initialize data structures. */
+	// Initialize data structures.
 	init_board(&b);
 
-	/* Read and solve board. */
+	// Read and solve board.
 	read_board(in, &b);
 	ret = solve_board(&b, MIN_NUM, MIN_NUM);
 
-	/* Close input and return. */
+	// Close input and return.
 	fclose(in);
 
 	if (! ret)
@@ -108,7 +55,7 @@ int main(int argc, char *argv[])
 
 	return (ret?0:3);
 }
-
+*/
 /*
  * All candidates start as unused.
  */
@@ -368,26 +315,53 @@ int solve_board(struct board *b, int r, int c)
  *     . . . . 8 . . 7 9
  *
  */
-void read_board(FILE *f, struct board *b)
+void read_board(char *f, struct board *b)
 {
 	int row;
 	int col;
 	int c;
+	int i = 0;
 
 	assert_(f != NULL && b != NULL);
 
 	row = MIN_NUM;
 	col = MIN_NUM;
 
-	while (! feof(f)) {
-		c = fgetc(f);
+
+	// while (! feof(f)) {
+	while (f != 0) {
+		c = f[i];
 		if ((isdigit(c) && c != '0') || c == '.') {
 			if (c != '.')
 				set_cell(b, row, col, (c - '0'));
 			if (! next_cell(&row, &col))
 				break;
 		}
+		i++;
 	}
+	//print_board(b);
 }
 
 
+/*
+ * Returns the given board on screen.
+ */
+char* return_board(struct board *b)
+{
+	int i;
+	int j;
+	char* sudoku = malloc(81*sizeof(char));
+	char str[1]
+
+	assert_(b != NULL);
+
+	for (i = MIN_NUM; i <= MAX_NUM; ++i) {
+		for (j = MIN_NUM; j <= MAX_NUM; ++j){
+			sprintf(str, "%d", b->cells[i][j].value);
+			strcat(sudoku, str);
+		}
+
+	}
+
+	return sudoku;
+}

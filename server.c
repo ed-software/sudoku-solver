@@ -13,15 +13,18 @@
 #include <assert.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "sudoku.h"
 
 int waitForConnection (int serverSocket);
 int makeServerSocket (int portno);
 void serveHTML (int socket);
+char* extract (char *message);
+void serveAlmond (int socket, char* sudoku);
 
 #define SIMPLE_SERVER_VERSION 2.0
 #define REQUEST_BUFFER_SIZE 1000
 #define DEFAULT_PORT 7191
-#define NUMBER_OF_PAGES_TO_SERVE 10
+#define NUMBER_OF_PAGES_TO_SERVE 100
 // after serving this many pages the server will halt
 
 int main (int argc, char* argv[]) {
@@ -52,11 +55,43 @@ int main (int argc, char* argv[]) {
 
         // STEP 3. send the browser a simple html page using http
         printf (" *** Sending http response ***\n");
-        serveHTML (connectionSocket);
+
+        if (request[5] != ' ') {
+            char* sudoku = request;
+            sudoku += 5;
+            int i = 0;
+            sudoku[81] = 0;
+
+
+
+            struct board b;
+            int ret;
+            // Initialize data structures.
+            init_board(&b);
+
+            // Read and solve board.
+            read_board(sudoku, &b);
+            ret = solve_board(&b, MIN_NUM, MIN_NUM);
+
+            // Close input and return.
+            // fclose(sudoku);
+            serveAlmond (connectionSocket, return_board(&b));
+
+            if (! ret) {
+                fprintf(stderr, "ERROR: board could not be solved\n");
+            }
+
+
+        } else {
+            serveHTML (connectionSocket);
+        }
 
         // STEP 4. close the connection after sending the page- keep aust beautiful
         close (connectionSocket);
         ++numberServed;
+
+
+
     }
 
     // close the server connection after we are done- keep aust beautiful
@@ -66,7 +101,7 @@ int main (int argc, char* argv[]) {
     return EXIT_SUCCESS;
 }
 
-void serveHTML(int socket) {
+void serveHTML (int socket) {
     const char* message =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
@@ -75,7 +110,8 @@ void serveHTML(int socket) {
     "<head>"
     "<title>Sudoku Solver</title>"
     "</head>"
-    "<script src=\"sudoku.js\"></script>";
+    "<script src=\"http://188.166.189.211/sudoku.js\"></script>"
+    "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://188.166.189.211/style.css\">";
 
     // echo the http response to the console for debugging purposes
     printf ("VVVV about to send this via http VVVV\n");
@@ -83,7 +119,7 @@ void serveHTML(int socket) {
     printf ("^^^^ end of message ^^^^\n");
 
     // send the http response to the web browser which requested it
-    send (socket, message, strlen(message), 0);
+    send (socket, message, strlen (message), 0);
 }
 
 // start the server listening on the specified port number
@@ -132,6 +168,24 @@ int waitForConnection (int serverSocket) {
     // check for connection error
 
     return connectionSocket;
+}
+
+// Write the image data for a Mandelbrot tile to the server
+void serveAlmond (int socket, char* sudoku) {
+    char* message;
+
+
+    // First send the http response header
+
+    message = "HTTP/1.0 200 OK\r\n"
+    "Content-Type: text/html\r\n"
+    "\r\n";
+    printf ("Serving a fresh almond from...\n");
+    printf ("%s\n", message);
+
+    assert(write (socket, message, strlen (message)));
+    assert(write (socket, sudoku, strlen(sudoku)));
+
 }
 
 /*
