@@ -17,7 +17,7 @@
 
 int waitForConnection (int serverSocket);
 int makeServerSocket (int portno);
-void serveHTML (int socket, FILE *in);
+void serveHTML (int socket);
 char* extract (char *message);
 void serveAlmond (int socket, char* sudoku);
 void serveError (int socket);
@@ -30,20 +30,7 @@ void serveError (int socket);
 
 int main (int argc, char* argv[]) {
 
-    FILE *in;
 
-    if (argc > 2) {
-        fprintf(stderr, "ERROR: too many arguments\n");
-        return 1;
-    }
-
-    if (argc == 2) {
-        in = fopen(argv[1], "r");
-        if (in == NULL) {
-            fprintf(stderr, "ERROR: could not open \"%s\"\n", argv[1]);
-            return 2;
-        }
-    }
 
     printf ("************************************\n");
     printf ("Starting simple server %f\n", SIMPLE_SERVER_VERSION);
@@ -96,7 +83,7 @@ int main (int argc, char* argv[]) {
 
 
         } else {
-            serveHTML (connectionSocket, in);
+            serveHTML (connectionSocket);
         }
 
         // STEP 4. close the connection after sending the page- keep aust beautiful
@@ -114,26 +101,13 @@ int main (int argc, char* argv[]) {
     return EXIT_SUCCESS;
 }
 
-void serveHTML (int socket, FILE *in) {
-
-
+void serveHTML (int socket) {
+    FILE *in;
     char* message;
+    in = fopen("input.html", "r");
 
     printf("MESSAGE IS \n\n %s", message);
     fscanf(in, " %[^\a]s", message);
-/*
-
-    const char* message =
-    "HTTP/1.1 200 OK\r\n"
-    "Content-Type: text/html\r\n"
-    "\r\n"
-    "<!DOCTYPE html>"
-    "<head>"
-    "<title>Sudoku Solver</title>"
-    "</head>"
-    "<script src=\"http://188.166.189.211/sudoku.js\"></script>"
-    "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://188.166.189.211/style.css\">";
-    */
 
     // echo the http response to the console for debugging purposes
     printf ("VVVV about to send this via http VVVV\n");
