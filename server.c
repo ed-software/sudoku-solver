@@ -102,12 +102,15 @@ int main (int argc, char* argv[]) {
 }
 
 void serveHTML (int socket) {
+
     FILE *in;
     char* message;
     in = fopen("input.html", "r");
 
     printf("MESSAGE IS \n\n %s", message);
     fscanf(in, " %[^\a]s", message);
+
+
 
     // echo the http response to the console for debugging purposes
     printf ("VVVV about to send this via http VVVV\n");
@@ -116,6 +119,7 @@ void serveHTML (int socket) {
 
     // send the http response to the web browser which requested it
     send (socket, message, strlen (message), 0);
+    fclose(in);
 }
 
 void serveError (int socket) {
@@ -193,19 +197,98 @@ int waitForConnection (int serverSocket) {
 
 // Write the image data for a Mandelbrot tile to the server
 void serveAlmond (int socket, char* sudoku) {
-    char* message;
 
-    // First send the http response header
+    //FILE *in;
+    //char* message;
+    //in = fopen("input.html", "r");
 
-    message = "HTTP/1.0 200 OK\r\n"
+
+    //printf("%s", in);
+    //fscanf(in, " %[^\a]s", message);
+
+    const char* header =
+    "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
     "\r\n";
+
+    const char* message =
+    "<!DOCTYPE html>"
+    "<head>"
+    "<title>Sudoku Solver</title>"
+    "<script>"
+    "var sudoku = document.getElementsByTagName(\"body\")[0].innerText;"
+    "sudoku = sudoku.replace(/\\D/g,'');"
+    "document.getElementsByTagName(\"body\")[0].innerText = \"\";"
+    "document.write(\"<table border=\'1\'>\");"
+      "var counter = 1;"
+      "var bx;"
+      "var by;"
+      "var x;"
+      "var box;"
+      "var row;"
+      "var v;"
+      "var id;"
+      "var array = [];"
+      "var square = [];"
+
+      "for (i=0;i<9;i++) {"
+          "if (i < 3) {"
+              "by = 0;"
+          "} else if (i >= 3 && i < 6) {"
+              "by = 1;"
+          "} else if (i >= 6 && i < 9) {"
+              "by = 2;"
+          "}"
+          "document.write(\"<tr>\");"
+          "for (j=1;j<=9;j++) {"
+              "if (j <= 3) {"
+                  "bx = 0;"
+              "} else if (j >= 3 && j <= 6) {"
+                  "bx = 1;"
+              "} else if (j >= 6 && j <= 9) {"
+                  "bx = 2;"
+              "}"
+              "y = ((counter-(counter-1)%9)-1)/9+1;"
+              "if (counter % 9 != 0){"
+                  "x = counter % 9;"
+              "} else {"
+                  "x = 9;"
+              "}"
+              "box = (parseInt(bx.toString() + by.toString(), 3) + 1);"
+
+              "document.write(\"<td>\");"
+              "document.write(\"<input type='text' value=\'\" + sudoku.charAt(0) + \"\'>\");"
+              "sudoku = sudoku.substring(1);"
+              "document.write(\"</td>\");"
+              "square = [counter, x, y, box];"
+              "array.push(square);"
+              "counter++;"
+          "}"
+          "document.write(\"</tr>\");"
+        "}"
+        "document.write(\"</table>\");"
+
+        "</script>"
+        "<style>"
+           "input[type=\"text\"]"
+           "{"
+           "height: 20px;"
+           "width: 20px;"
+           "}"
+        "</style>"
+        "</head>"
+        "<html>"
+        "<body>"
+        "</body>"
+        "</html>";
+
     printf ("Serving a fresh almond from...\n");
     printf ("%s\n", message);
 
-    assert(write (socket, message, strlen (message)));
+    assert(write (socket, header, strlen(header)));
     assert(write (socket, sudoku, strlen(sudoku)));
-
+    assert(write (socket, message, strlen (message)));
+    //fclose(in);
 }
 
 /*
