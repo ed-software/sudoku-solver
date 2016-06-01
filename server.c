@@ -17,9 +17,10 @@
 
 int waitForConnection (int serverSocket);
 int makeServerSocket (int portno);
-void serveHTML (int socket);
+void serveHTML (int socket, FILE *in);
 char* extract (char *message);
 void serveAlmond (int socket, char* sudoku);
+void serveError (int socket);
 
 #define SIMPLE_SERVER_VERSION 2.0
 #define REQUEST_BUFFER_SIZE 1000
@@ -28,6 +29,21 @@ void serveAlmond (int socket, char* sudoku);
 // after serving this many pages the server will halt
 
 int main (int argc, char* argv[]) {
+
+    FILE *in;
+
+    if (argc > 2) {
+        fprintf(stderr, "ERROR: too many arguments\n");
+        return 1;
+    }
+
+    if (argc == 2) {
+        in = fopen(argv[1], "r");
+        if (in == NULL) {
+            fprintf(stderr, "ERROR: could not open \"%s\"\n", argv[1]);
+            return 2;
+        }
+    }
 
     printf ("************************************\n");
     printf ("Starting simple server %f\n", SIMPLE_SERVER_VERSION);
@@ -62,8 +78,6 @@ int main (int argc, char* argv[]) {
             int i = 0;
             sudoku[81] = 0;
 
-
-
             struct board b;
             int ret;
             // Initialize data structures.
@@ -73,17 +87,16 @@ int main (int argc, char* argv[]) {
             read_board(sudoku, &b);
             ret = solve_board(&b, MIN_NUM, MIN_NUM);
 
-            // Close input and return.
-            // fclose(sudoku);
-            serveAlmond (connectionSocket, return_board(&b));
-
             if (! ret) {
                 fprintf(stderr, "ERROR: board could not be solved\n");
+                serveError (connectionSocket);
+            } else {
+                serveAlmond (connectionSocket, return_board(&b));
             }
 
 
         } else {
-            serveHTML (connectionSocket);
+            serveHTML (connectionSocket, in);
         }
 
         // STEP 4. close the connection after sending the page- keep aust beautiful
@@ -101,7 +114,15 @@ int main (int argc, char* argv[]) {
     return EXIT_SUCCESS;
 }
 
-void serveHTML (int socket) {
+void serveHTML (int socket, FILE *in) {
+
+
+    char* message;
+
+    printf("MESSAGE IS \n\n %s", message);
+    fscanf(in, " %[^\a]s", message);
+/*
+
     const char* message =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
@@ -112,6 +133,7 @@ void serveHTML (int socket) {
     "</head>"
     "<script src=\"http://188.166.189.211/sudoku.js\"></script>"
     "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://188.166.189.211/style.css\">";
+    */
 
     // echo the http response to the console for debugging purposes
     printf ("VVVV about to send this via http VVVV\n");
@@ -121,6 +143,31 @@ void serveHTML (int socket) {
     // send the http response to the web browser which requested it
     send (socket, message, strlen (message), 0);
 }
+
+void serveError (int socket) {
+    const char* message =
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html\r\n"
+    "\r\n"
+    "<!DOCTYPE html>"
+    "<head>"
+    "<title>Sudoku Solver</title>"
+    "</head>"
+    "<html>"
+    "<body>"
+    "Error, puzzle could not be solved."
+    "</body>"
+    "</html>";
+
+    // echo the http response to the console for debugging purposes
+    printf ("VVVV about to send this via http VVVV\n");
+    printf ("%s\n", message);
+    printf ("^^^^ end of message ^^^^\n");
+
+    // send the http response to the web browser which requested it
+    send (socket, message, strlen (message), 0);
+}
+
 
 // start the server listening on the specified port number
 int makeServerSocket (int portNumber) {
