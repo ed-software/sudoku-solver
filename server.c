@@ -195,7 +195,6 @@ int waitForConnection (int serverSocket) {
 void serveAlmond (int socket, char* sudoku) {
     char* message;
 
-
     // First send the http response header
 
     message = "HTTP/1.0 200 OK\r\n"

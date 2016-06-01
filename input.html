@@ -53,12 +53,29 @@
           document.write("</tr>");
       }
       document.write("</table>");
+
+      function solve() {
+          var sudoku = "";
+
+          for (i = 1; i <= 81; i++) {
+             if (document.getElementById(i).value) {
+                sudoku += document.getElementById(i).value;
+             } else {
+                sudoku += ".";
+             }
+          }
+
+          window.location.href = "http://localhost:7191/" + sudoku;
+      }
    </script>
-   <link rel="stylesheet">
+   <style>
       input[type="text"]
       {
       height: 20px;
       width: 20px;
       }
-   </link>
+   </style>
+   <body>
+      <input type="button" value="Solve" onClick="solve()">
+   </body>
 </html>
