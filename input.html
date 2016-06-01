@@ -5,6 +5,13 @@
          Sudoku Solver
       </title>
    </head>
+   <style>
+      input[type="text"]
+      {
+      height: 20px;
+      width: 20px;
+      }
+   </style>
    <script type="text/javascript">
       document.write("<table border=\"1\">");
       var counter = 1;
@@ -65,16 +72,11 @@
              }
           }
 
-          window.location.href = "http://localhost:7191/" + sudoku;
+          var solutionURL = window.location.href + sudoku;
+          document.write("<iframe src='" + solutionURL + "' height='100%' width='100%' frameBorder='0'></iframe>");
       }
    </script>
-   <style>
-      input[type="text"]
-      {
-      height: 20px;
-      width: 20px;
-      }
-   </style>
+
    <body>
       <input type="button" value="Solve" onClick="solve()">
    </body>

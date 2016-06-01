@@ -1,61 +1,10 @@
-/*
- * sudoku.c: A simple command-line Sudoku solver in C for educational purposes.
- *
- * Author: Ricardo Garcia Gonzalez.
- * License: Public domain code.
- */
-
- #include <assert.h>
- #include <ctype.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
+#include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "sudoku.h"
 
-/*
- *
- * MAIN PROGRAM.
- *
- */
-/*
-int main(int argc, char *argv[])
-{
-	FILE *in;
-	struct board b;
-
-	int ret;
-
-	if (argc > 2) {
-		fprintf(stderr, "ERROR: too many arguments\n");
-		return 1;
-	}
-
-	if (argc == 2) {
-		in = fopen(argv[1], "r");
-		if (in == NULL) {
-			fprintf(stderr, "ERROR: could not open \"%s\"\n", argv[1]);
-			return 2;
-		}
-	} else {
-		in = stdin;
-	}
-
-	// Initialize data structures.
-	init_board(&b);
-
-	// Read and solve board.
-	read_board(in, &b);
-	ret = solve_board(&b, MIN_NUM, MIN_NUM);
-
-	// Close input and return.
-	fclose(in);
-
-	if (! ret)
-		fprintf(stderr, "ERROR: board could not be solved\n");
-
-	return (ret?0:3);
-}
-*/
 /*
  * All candidates start as unused.
  */
@@ -269,8 +218,7 @@ int solve_board(struct board *b, int r, int c)
 	}
 
 	/* Find the next unset cell. */
-	while (is_set(b, r, c) && next_cell(&r, &c))
-	       ;
+	while (is_set(b, r, c) && next_cell(&r, &c));
 
 	/* This should never happen. */
 	if (is_set(b, r, c))

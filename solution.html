@@ -1,67 +1,73 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>
-         Sudoku Solver
-      </title>
-   </head>
-   <script type="text/javascript">
-      document.write("<table border=\"1\">");
-      var counter = 1;
-      var bx;
-      var by;
-      var x;
-      var box;
-      var row;
-      var v;
-      var id;
-      var array = [];
-      var square = [];
+<head>
+<title>Sudoku Solver</title>
+<style>
+  input[type=\"text\"]
+  {
+  height: 20px;
+  width: 20px;
+  }
+  body
+  {
+  margin: 0;
+  }
+</style>
+<script>
+var sudoku = document.getElementsByTagName("body")[0].innerText;
+sudoku = sudoku.replace(/\D/g,'');
+document.getElementsByTagName("body")[0].innerText = "";
+document.write("<table border='1'>");
+   var counter = 1;
+   var bx;
+   var by;
+   var x;
+   var box;
+   var row;
+   var v;
+   var id;
+   var array = [];
+   var square = [];
 
-      for (i=0;i<9;i++) {
-          if (i < 3) {
-              by = 0;
-          } else if (i >= 3 && i < 6) {
-              by = 1;
-          } else if (i >= 6 && i < 9) {
-              by = 2;
-          }
-          document.write("<tr>");
-          for (j=1;j<=9;j++) {
-              if (j <= 3) {
-                  bx = 0;
-              } else if (j >= 3 && j <= 6) {
-                  bx = 1;
-              } else if (j >= 6 && j <= 9) {
-                  bx = 2;
-              }
-              y = ((counter-(counter-1)%9)-1)/9+1;
-              if (counter % 9 != 0){
-                  x = counter % 9;
-              } else {
-                  x = 9;
-              }
-              box = (parseInt(bx.toString() + by.toString(), 3) + 1);
+   for (i=0;i<9;i++) {
+       if (i < 3) {
+          by = 0;
+       } else if (i >= 3 && i < 6) {
+           by = 1;
+       } else if (i >= 6 && i < 9) {
+           by = 2;
+       }
+       document.write("<tr>");
+       for (j=1;j<=9;j++) {
+           if (j <= 3) {
+               bx = 0;
+           } else if (j >= 3 && j <= 6) {
+               bx = 1;
+           } else if (j >= 6 && j <= 9) {
+               bx = 2;
+           }
+           y = ((counter-(counter-1)%9)-1)/9+1;
+           if (counter % 9 != 0){
+               x = counter % 9;
+           } else {
+               x = 9;
+           }
+           box = (parseInt(bx.toString() + by.toString(), 3) + 1);
 
-              document.write("<td>");
-              document.write("<input type=\"text\" id=\"" + counter + "\">");
-              document.write("</td>");
-              square = [counter, x, y, box];
-              array.push(square);
-              counter++;
-          }
-          document.write("</tr>");
-      }
-      document.write("</table>");
-   </script>
-   <style>
-      input[type="text"]
-      {
-      height: 20px;
-      width: 20px;
-      }
-   </style>
-   <body>
-      
-   </body>
+           document.write("<td>");
+           document.write("<input type='text' value='" + sudoku.charAt(0) + "'>");
+           sudoku = sudoku.substring(1);
+           document.write("</td>");
+           square = [counter, x, y, box];
+           array.push(square);
+           counter++;
+       }
+       document.write("</tr>");
+     }
+     document.write("</table>");
+
+     </script>
+     </head>
+     <body>
+     </body>
 </html>
