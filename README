@@ -1,12 +1,5 @@
-TODO
+To compile:
+`gcc -o sudoku sudoku.c server.c`
 
-Give things better names
-Clean server.c
-Clean sudoku.c
-implement solution.html
-implement sudoku.js and solve.js
-clean readme
-fix weird size difference between input and solution
-fix gitignore
-clean input.html
-write solution.html
+To run:
+`./sudoku`
